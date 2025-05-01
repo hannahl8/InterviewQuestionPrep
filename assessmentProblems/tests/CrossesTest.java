@@ -124,9 +124,9 @@ class CrossesTest {
      * @param arr the matrix to print
      */
     private void printMatrix(int[][] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                System.out.print(arr[i][j] + " ");
+        for (int[] ints : arr) {
+            for (int anInt : ints) {
+                System.out.print(anInt + " ");
             }
             System.out.println();
         }
