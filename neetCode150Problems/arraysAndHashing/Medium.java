@@ -1,10 +1,6 @@
 package neetCode150Problems.arraysAndHashing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * <h1>Medium NeetCode questions for Arrays and Hashing</h1>
@@ -116,24 +112,27 @@ public class Medium {
      * @return a list of {@code k} integers that are the most frequent in {@code nums}
      */
     public int[] topKFrequent(int[] nums, int k) {
-        Map<Integer, Integer> count = new HashMap<>();
-        List<Integer>[] freq = new List[nums.length + 1];
-        for (int i = 0; i < freq.length; i++) {
-            freq[i] = new ArrayList<>();
-        }
-        for (int n : nums) {
-            count.put(n, count.getOrDefault(n, 0) + 1);
+        Map<Integer, Integer> map = new HashMap<>();
+        List<Integer>[] list = new List[nums.length + 1];
+
+        for (int i = 0; i < list.length; i++) {
+            list[i] = new ArrayList<>();
         }
 
-        for (Map.Entry<Integer, Integer> entry : count.entrySet()) {
-            freq[entry.getValue()].add(entry.getKey());
+        for (int num : nums) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
         }
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            list[entry.getValue()].add(entry.getKey());
+        }
+
 
         int[] res = new int[k];
         int index = 0;
-        for (int i = freq.length - 1; i > 0 && index < k; i--) {
-            for (int n : freq[i]) {
-                res[index] = n;
+        for (int i = list.length - 1; i >= 0; i--) {
+            for (int num : list[i]) {
+                res[index] = num;
                 index++;
                 if (index == k) {
                     return res;
@@ -180,18 +179,33 @@ public class Medium {
      * @return the encoded string in {@code encode()} or the decoded list of strings in {@code decode()}
      */
     public String encode(List<String> strs) {
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
+        StringBuilder builder = new StringBuilder();
+        for (String s : strs) {
+            builder.append(s.length()).append('#').append(s);
+        }
+        return builder.toString();
     }
 
     /**
      * Decodes a single encoded string to a list of strings.
      *
-     * @param s the encoded string
+     * @param str the encoded string
      * @return the decoded list of strings
      */
-    public List<String> decode(String s) {
+    public List<String> decode(String str) {
         List<String> res = new ArrayList<>();
+        int i = 0;
+        while (i < str.length()) {
+            int j = i;
+            while (str.charAt(j) != '#') {
+                j++;
+            }
+            int length = Integer.parseInt(str.substring(i, j));
+            i = j + 1;
+            j = i + length;
+            res.add(str.substring(i, j));
+            i = j;
+        }
         return res;
     }
 
@@ -233,7 +247,18 @@ public class Medium {
      * @return an array where each element is the product of all elements in {@code nums} except for the one at the same index
      */
     public int[] productExceptSelf(int[] nums) {
-        return new int[]{};
+        int[] res = new int[nums.length];
+        int prefix = 1;
+        for (int i = 0; i < nums.length; i++) {
+            res[i] = prefix;
+            prefix *= nums[i];
+        }
+        int postfix = 1;
+        for (int i = nums.length - 1; i >= 0; i--) {
+            res[i] *= postfix;
+            postfix *= nums[i];
+        }
+        return res;
     }
 
     /**
@@ -300,7 +325,26 @@ public class Medium {
      * @return {@code true} if the board is valid according to Sudoku rules, otherwise {@code false}
      */
     public boolean isValidSudoku(char[][] board) {
-        return false;
+        Map<Integer, HashSet<Character>> rows = new HashMap<>();
+        Map<Integer, HashSet<Character>> cols = new HashMap<>();
+        Map<String, HashSet<Character>> grid = new HashMap<>();
+
+        for (int row = 0; row < board.length; row++) {
+            for (int col = 0; col < board[0].length; col++) {
+                if (board[row][col] == '.') continue;
+                String key = row / 3 + ", " + col / 3;
+                if (rows.computeIfAbsent(row, k -> new HashSet<>()).contains(board[row][col]) ||
+                        cols.computeIfAbsent(col, k -> new HashSet<>()).contains(board[row][col]) ||
+                        grid.computeIfAbsent(key, k -> new HashSet<>()).contains(board[row][col])) {
+                    return false;
+                }
+                rows.get(row).add(board[row][col]);
+                cols.get(col).add(board[row][col]);
+                grid.get(key).add(board[row][col]);
+
+            }
+        }
+        return true;
     }
 
     /**
@@ -340,7 +384,19 @@ public class Medium {
      * @return the length of the longest consecutive sequence
      */
     public int longestConsecutive(int[] nums) {
-        return 0;
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        int longest = 0;
+        for (int num : set) {
+            int i = 0;
+            if (!set.contains(num - 1)) {
+                while (set.contains(num + i)) i++;
+            }
+            longest = Math.max(longest, i);
+        }
+        return longest;
     }
 
 }
